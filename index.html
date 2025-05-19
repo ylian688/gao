@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D 旋转图片效果</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .preserve-3d {
+        transform-style: preserve-3d;
+      }
+      .perspective-1000 {
+        perspective: 1000px;
+      }
+      .rotate-y-0 {
+        transform: rotateY(0deg);
+      }
+      .rotate-y-90 {
+        transform: rotateY(90deg);
+      }
+      .rotate-y-180 {
+        transform: rotateY(180deg);
+      }
+      .rotate-y-270 {
+        transform: rotateY(270deg);
+      }
+      .backface-hidden {
+        backface-visibility: hidden;
+      }
+      .transition-transform {
+        transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-dark to-slate-800 min-h-screen font-inter text-light flex flex-col items-center justify-center p-4">
+  <div class="max-w-4xl mx-auto text-center mb-10">
+    <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">3D 旋转图片画廊</h1>
+    <p class="text-lg text-slate-300 max-w-2xl mx-auto">将鼠标悬停在图片容器上，体验令人惊叹的3D旋转效果。每张图片都有精心设计的过渡动画和阴影效果，创造出深度感和层次感。</p>
+  </div>
+
+  <div class="perspective-1000 mb-16">
+    <div id="carousel" class="relative w-[clamp(280px,70vw,500px)] h-[clamp(380px,80vw,600px)] preserve-3d transition-transform duration-1000">
+      <img src="5.png" alt="风景照片1" class="absolute inset-0 w-full h-full object-cover rounded-xl shadow-2xl backface-hidden rotate-y-0">
+      <img src="6.png" alt="风景照片2" class="absolute inset-0 w-full h-full object-cover rounded-xl shadow-2xl backface-hidden rotate-y-90">
+      <img src="7.png" alt="风景照片3" class="absolute inset-0 w-full h-full object-cover rounded-xl shadow-2xl backface-hidden rotate-y-180">
+      <img src="8.png" alt="风景照片4" class="absolute inset-0 w-full h-full object-cover rounded-xl shadow-2xl backface-hidden rotate-y-270">
+    </div>
+  </div>
+
+  <div class="text-center">
+    <button id="toggleButton" class="bg-primary hover:bg-primary/80 text-white font-medium py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center mx-auto">
+      <i class="fa-solid fa-refresh mr-2"></i> 自动旋转
+    </button>
+    <p class="mt-4 text-sm text-slate-400">提示：也可以通过鼠标悬停来控制旋转</p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const carousel = document.getElementById('carousel');
+      const toggleButton = document.getElementById('toggleButton');
+      const images = carousel.querySelectorAll('img');
+      let autoRotateInterval;
+      let isAutoRotating = false;
+      let currentRotation = 0;
+      const rotationStep = 90;
+      const imageCount = images.length;
+      
+      // 设置每张图片的位置
+      images.forEach((img, index) => {
+        const angle = (360 / imageCount) * index;
+        img.style.transform = `rotateY(${angle}deg) translateZ(${carousel.offsetWidth / 2}px)`;
+      });
+      
+      // 鼠标悬停效果
+      carousel.addEventListener('mouseenter', () => {
+        if (!isAutoRotating) {
+          rotateCarousel(currentRotation + rotationStep);
+        }
+      });
+      
+      // 点击按钮切换自动旋转状态
+      toggleButton.addEventListener('click', () => {
+        if (isAutoRotating) {
+          clearInterval(autoRotateInterval);
+          toggleButton.innerHTML = '<i class="fa-solid fa-refresh mr-2"></i> 自动旋转';
+          toggleButton.classList.remove('bg-secondary');
+          toggleButton.classList.add('bg-primary');
+        } else {
+          autoRotateInterval = setInterval(() => {
+            rotateCarousel(currentRotation + rotationStep);
+          }, 3000);
+          toggleButton.innerHTML = '<i class="fa-solid fa-pause mr-2"></i> 停止旋转';
+          toggleButton.classList.remove('bg-primary');
+          toggleButton.classList.add('bg-secondary');
+        }
+        isAutoRotating = !isAutoRotating;
+      });
+      
+      // 旋转轮播函数
+      function rotateCarousel(angle) {
+        currentRotation = angle % 360;
+        carousel.style.transform = `rotateY(${-currentRotation}deg)`;
+      }
+      
+      // 窗口大小调整时重新计算
+      window.addEventListener('resize', () => {
+        images.forEach((img, index) => {
+          const angle = (360 / imageCount) * index;
+          img.style.transform = `rotateY(${angle}deg) translateZ(${carousel.offsetWidth / 2}px)`;
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
+  
